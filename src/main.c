@@ -60,3 +60,4 @@ int main() {
 
     return 0;
 }
+END_OF_MAIN(); // para ficar compatível com Windows
