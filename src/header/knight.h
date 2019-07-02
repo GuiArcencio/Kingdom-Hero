@@ -15,3 +15,4 @@ void destroy_knight(Knight* k); // Função para eliminação do cavaleiro da me
 void knight_update_frame(Knight* p); // Atualizar o gráfico do cavaleiro
 
 void knight_draw(Knight* p); // Desenhar o cavaleiro na tela
+void knight_attack(Knight* p); // Mudar para animação de ataque

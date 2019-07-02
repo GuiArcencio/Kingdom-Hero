@@ -31,9 +31,30 @@ void knight_update_frame(Knight* p) {
                 p->contFrame++;
             }
             break;
+        case ATTACK:
+            if (p->contFrame >= 6) {
+                if (p->currentFrame < 5) {
+                    p->currentFrame = (p->currentFrame + 1) % 6;
+                    p->contFrame = 0;
+                } else {
+                    p->state = IDLE;
+                    p->currentBitmap = p->idleBitmap;
+                    p->currentFrame = p->contFrame = 0;
+                }
+            } else {
+                p->contFrame++;
+            }
     }
 }
 
 void knight_draw(Knight* p) {
     al_draw_scaled_bitmap(p->currentBitmap, p->currentFrame * 180, 0, 180, 160, 300, 400, 180, 160, 0);
+}
+
+void knight_attack(Knight* p) {
+    if (p->state != ATTACK || p->currentFrame > 2) {
+        p->state = ATTACK;
+        p->currentBitmap = p->attackBitmap;
+        p->contFrame = p->currentFrame = 0;
+    }
 }

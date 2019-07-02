@@ -14,7 +14,7 @@ int main(void) {
     ALLEGRO_EVENT_QUEUE* fila_eventos = al_create_event_queue(); // fila de eventos
     al_set_new_display_option(ALLEGRO_SAMPLE_BUFFERS, 1, ALLEGRO_SUGGEST); // opções para melhorar os gráficos
     al_set_new_display_option(ALLEGRO_SAMPLES, 8, ALLEGRO_SUGGEST);
-    al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
+    //al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
 
     ALLEGRO_DISPLAY* janela = al_create_display(SCREEN_W, SCREEN_H); // janela
     al_set_window_title(janela, "Jogo daora");
@@ -43,8 +43,19 @@ int main(void) {
                 desenha = true;
                 break;
             case ALLEGRO_EVENT_KEY_DOWN:
-                if (evento.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
-                    sair = true;
+                switch (evento.keyboard.keycode) {
+                    case ALLEGRO_KEY_ESCAPE:
+                        sair = true; 
+                        break;
+                    case ALLEGRO_KEY_Q:
+                    case ALLEGRO_KEY_W:
+                    case ALLEGRO_KEY_E:
+                    case ALLEGRO_KEY_R:
+                        knight_attack(jogador);
+                        break;
+                    default:
+                        break;
+                }
                 break;
             case ALLEGRO_EVENT_DISPLAY_CLOSE:
                 sair = true;
