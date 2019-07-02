@@ -1,10 +1,11 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_image.h>
+#include "header/knight.h"
 
 #define SCREEN_W 800 // largura da tela
 #define SCREEN_H 600 // altura da tela
 
-int main() {
+int main(void) {
     al_init();
     al_install_keyboard();
     al_init_image_addon();
@@ -14,6 +15,7 @@ int main() {
     al_set_new_display_option(ALLEGRO_SAMPLE_BUFFERS, 1, ALLEGRO_SUGGEST); // opções para melhorar os gráficos
     al_set_new_display_option(ALLEGRO_SAMPLES, 8, ALLEGRO_SUGGEST);
     al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
+
     ALLEGRO_DISPLAY* janela = al_create_display(SCREEN_W, SCREEN_H); // janela
     al_set_window_title(janela, "Jogo daora");
 
@@ -28,13 +30,21 @@ int main() {
 
     ALLEGRO_EVENT evento;
 
+    Knight* jogador = create_knight();
+
     al_start_timer(timer);
     while (!sair) {
         al_wait_for_event(fila_eventos, &evento);
 
         switch (evento.type) {
             case ALLEGRO_EVENT_TIMER:
+                knight_update_frame(jogador);
+
                 desenha = true;
+                break;
+            case ALLEGRO_EVENT_KEY_DOWN:
+                if (evento.keyboard.keycode == ALLEGRO_KEY_ESCAPE)
+                    sair = true;
                 break;
             case ALLEGRO_EVENT_DISPLAY_CLOSE:
                 sair = true;
@@ -46,7 +56,9 @@ int main() {
         if (desenha && al_is_event_queue_empty(fila_eventos)) {
             al_clear_to_color(al_map_rgb(255, 255, 255));
 
-            al_draw_scaled_bitmap(background, 0, 0, 2048, 1546, 0, 0, 800, 600, 0);
+            al_draw_scaled_bitmap(background, 0, 0, 2048, 1546, 0, 0, SCREEN_W, SCREEN_H, 0);
+
+            knight_draw(jogador);
 
             al_flip_display();
             desenha = false;
@@ -57,7 +69,7 @@ int main() {
     al_destroy_timer(timer);
     al_destroy_event_queue(fila_eventos);
     al_destroy_bitmap(background);
+    destroy_knight(jogador);
 
     return 0;
 }
-END_OF_MAIN(); // para ficar compatível com Windows
