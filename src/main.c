@@ -1,6 +1,7 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_image.h>
 #include "header/knight.h"
+#include "header/buttonqueue.h"
 
 #define SCREEN_W 800 // largura da tela
 #define SCREEN_H 600 // altura da tela
@@ -38,6 +39,8 @@ int main(void) {
     short i;
     Knight* jogador = create_knight();
     AudioHandler* audio = audio_load();
+    button_queue fila_botao = create_queue();
+    add_queue(&fila_botao);
 
     al_start_timer(timer);
     while (!sair) {
@@ -46,6 +49,7 @@ int main(void) {
         switch (evento.type) {
             case ALLEGRO_EVENT_TIMER:
                 knight_update_frame(jogador);
+                queue_update_pos(&fila_botao, 1.5);
 
                 desenha = true;
                 break;
@@ -79,6 +83,7 @@ int main(void) {
             al_draw_bitmap(w0, 90, 20, 0);
             al_draw_bitmap(e0, 160, 20, 0);
             al_draw_bitmap(r0, 230, 20, 0);
+            button_monster_draw(&fila_botao);
 
             for (i = 0; i < 3; i++) {
                 if (vidas[i]) al_draw_scaled_bitmap(heart, 0, 0, 254, 254, 700 + i*30, 20, 25, 25, 0);
@@ -102,6 +107,7 @@ int main(void) {
     al_destroy_bitmap(heart);
     destroy_knight(jogador);
     destroy_audio(audio);
+    destroy_queue(&fila_botao);
 
     return 0;
 }
