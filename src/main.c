@@ -27,12 +27,15 @@ int main(void) {
     ALLEGRO_BITMAP* w0 = al_load_bitmap("./assets/wa.png");
     ALLEGRO_BITMAP* e0 = al_load_bitmap("./assets/ea.png");
     ALLEGRO_BITMAP* r0 = al_load_bitmap("./assets/ra.png");
+    ALLEGRO_BITMAP* heart = al_load_bitmap("./assets/heart.png");
 
     bool sair = false;
     bool desenha = false;
 
     ALLEGRO_EVENT evento;
 
+    bool vidas[3] = {true, true, true};
+    short i;
     Knight* jogador = create_knight();
 
     al_start_timer(timer);
@@ -76,6 +79,10 @@ int main(void) {
             al_draw_bitmap(e0, 160, 20, 0);
             al_draw_bitmap(r0, 230, 20, 0);
 
+            for (i = 0; i < 3; i++) {
+                if (vidas[i]) al_draw_scaled_bitmap(heart, 0, 0, 254, 254, 700 + i*30, 20, 25, 25, 0);
+            }
+
             knight_draw(jogador);
 
             al_flip_display();
@@ -91,6 +98,7 @@ int main(void) {
     al_destroy_bitmap(w0);
     al_destroy_bitmap(e0);
     al_destroy_bitmap(r0);
+    al_destroy_bitmap(heart);
     destroy_knight(jogador);
 
     return 0;
