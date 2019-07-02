@@ -14,7 +14,6 @@ int main(void) {
     ALLEGRO_EVENT_QUEUE* fila_eventos = al_create_event_queue(); // fila de eventos
     al_set_new_display_option(ALLEGRO_SAMPLE_BUFFERS, 1, ALLEGRO_SUGGEST); // opções para melhorar os gráficos
     al_set_new_display_option(ALLEGRO_SAMPLES, 8, ALLEGRO_SUGGEST);
-    //al_set_new_bitmap_flags(ALLEGRO_MIN_LINEAR | ALLEGRO_MAG_LINEAR);
 
     ALLEGRO_DISPLAY* janela = al_create_display(SCREEN_W, SCREEN_H); // janela
     al_set_window_title(janela, "Jogo daora");
@@ -24,6 +23,10 @@ int main(void) {
     al_register_event_source(fila_eventos, al_get_timer_event_source(timer));
 
     ALLEGRO_BITMAP* background = al_load_bitmap("./assets/background.png");
+    ALLEGRO_BITMAP* q0 = al_load_bitmap("./assets/qa.png");
+    ALLEGRO_BITMAP* w0 = al_load_bitmap("./assets/wa.png");
+    ALLEGRO_BITMAP* e0 = al_load_bitmap("./assets/ea.png");
+    ALLEGRO_BITMAP* r0 = al_load_bitmap("./assets/ra.png");
 
     bool sair = false;
     bool desenha = false;
@@ -68,6 +71,10 @@ int main(void) {
             al_clear_to_color(al_map_rgb(255, 255, 255));
 
             al_draw_scaled_bitmap(background, 0, 0, 2048, 1546, 0, 0, SCREEN_W, SCREEN_H, 0);
+            al_draw_bitmap(q0, 20, 20, 0);
+            al_draw_bitmap(w0, 90, 20, 0);
+            al_draw_bitmap(e0, 160, 20, 0);
+            al_draw_bitmap(r0, 230, 20, 0);
 
             knight_draw(jogador);
 
@@ -80,6 +87,10 @@ int main(void) {
     al_destroy_timer(timer);
     al_destroy_event_queue(fila_eventos);
     al_destroy_bitmap(background);
+    al_destroy_bitmap(q0);
+    al_destroy_bitmap(w0);
+    al_destroy_bitmap(e0);
+    al_destroy_bitmap(r0);
     destroy_knight(jogador);
 
     return 0;
