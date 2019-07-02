@@ -51,10 +51,11 @@ void knight_draw(Knight* p) {
     al_draw_scaled_bitmap(p->currentBitmap, p->currentFrame * 180, 0, 180, 160, 300, 400, 180, 160, 0);
 }
 
-void knight_attack(Knight* p) {
+void knight_attack(Knight* p, AudioHandler* a) {
     if (p->state != ATTACK || p->currentFrame > 2) {
         p->state = ATTACK;
         p->currentBitmap = p->attackBitmap;
         p->contFrame = p->currentFrame = 0;
+        audio_espada(a);
     }
 }

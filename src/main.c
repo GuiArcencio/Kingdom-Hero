@@ -37,6 +37,7 @@ int main(void) {
     bool vidas[3] = {true, true, true};
     short i;
     Knight* jogador = create_knight();
+    AudioHandler* audio = audio_load();
 
     al_start_timer(timer);
     while (!sair) {
@@ -57,7 +58,7 @@ int main(void) {
                     case ALLEGRO_KEY_W:
                     case ALLEGRO_KEY_E:
                     case ALLEGRO_KEY_R:
-                        knight_attack(jogador);
+                        knight_attack(jogador, audio);
                         break;
                     default:
                         break;
@@ -100,6 +101,7 @@ int main(void) {
     al_destroy_bitmap(r0);
     al_destroy_bitmap(heart);
     destroy_knight(jogador);
+    destroy_audio(audio);
 
     return 0;
 }
