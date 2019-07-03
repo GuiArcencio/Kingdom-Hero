@@ -1,5 +1,11 @@
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_image.h>
+#include <allegro5/allegro_native_dialog.h>
+#include <allegro5/allegro_font.h>
+#include <allegro5/allegro_ttf.h>
+
+#include <stdio.h>
+
 #include "header/knight.h"
 #include "header/buttonqueue.h"
 
@@ -10,6 +16,8 @@ int main(void) {
     al_init();
     al_install_keyboard();
     al_init_image_addon();
+    al_init_font_addon();
+    al_init_ttf_addon();
 
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / 60.0); // timer
     ALLEGRO_EVENT_QUEUE* fila_eventos = al_create_event_queue(); // fila de eventos
@@ -19,6 +27,8 @@ int main(void) {
     ALLEGRO_DISPLAY* janela = al_create_display(SCREEN_W, SCREEN_H); // janela
     al_set_window_title(janela, "Jogo daora");
     al_set_blender(ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA);
+
+    ALLEGRO_FONT* fonte1 = al_load_font("./fonts/OpenSans-Bold.ttf", 28, ALLEGRO_ALIGN_CENTER);
 
     al_register_event_source(fila_eventos, al_get_keyboard_event_source()); // registra as fontes de eventos na fila de eventos
     al_register_event_source(fila_eventos, al_get_display_event_source(janela));
@@ -39,6 +49,7 @@ int main(void) {
     bool vidas[3] = {true, true, true};
     short i, lucro = 0;
     unsigned int pontos = 0;
+
     Knight* jogador = create_knight();
     AudioHandler* audio = audio_load();
     button_queue fila_botao = create_queue();
@@ -94,6 +105,8 @@ int main(void) {
             al_draw_bitmap(w0, 90, 20, 0);
             al_draw_bitmap(e0, 160, 20, 0);
             al_draw_bitmap(r0, 230, 20, 0);
+            al_draw_textf(fonte1, al_map_rgb(0, 0, 0), 500, 560, 0, "Pontos: %u", pontos);
+
             button_monster_draw(&fila_botao, &fila_mortos);
 
             for (i = 0; i < 3; i++) {
@@ -120,6 +133,7 @@ int main(void) {
     destroy_audio(audio);
     destroy_queue(&fila_botao);
     destroy_queue(&fila_mortos);
+    al_destroy_font(fonte1);
 
     return 0;
 }
