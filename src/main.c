@@ -18,6 +18,7 @@ int main(void) {
 
     ALLEGRO_DISPLAY* janela = al_create_display(SCREEN_W, SCREEN_H); // janela
     al_set_window_title(janela, "Jogo daora");
+    al_set_blender(ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA);
 
     al_register_event_source(fila_eventos, al_get_keyboard_event_source()); // registra as fontes de eventos na fila de eventos
     al_register_event_source(fila_eventos, al_get_display_event_source(janela));
@@ -34,12 +35,14 @@ int main(void) {
     bool desenha = false;
 
     ALLEGRO_EVENT evento;
-
+    
     bool vidas[3] = {true, true, true};
-    short i;
+    short i, lucro = 0;
+    unsigned int pontos = 0;
     Knight* jogador = create_knight();
     AudioHandler* audio = audio_load();
     button_queue fila_botao = create_queue();
+    button_queue fila_mortos = create_queue();
     add_queue(&fila_botao);
 
     al_start_timer(timer);
@@ -49,8 +52,8 @@ int main(void) {
         switch (evento.type) {
             case ALLEGRO_EVENT_TIMER:
                 knight_update_frame(jogador);
-                queue_update_pos(&fila_botao, 2);
-
+                queue_update_pos(&fila_botao, &fila_mortos, 5, vidas);
+                
                 desenha = true;
                 break;
             case ALLEGRO_EVENT_KEY_DOWN:
@@ -63,6 +66,14 @@ int main(void) {
                     case ALLEGRO_KEY_E:
                     case ALLEGRO_KEY_R:
                         knight_attack(jogador, audio);
+                        lucro = check_acerto(&fila_botao, &fila_mortos, evento.keyboard.keycode);
+                        pontos += lucro;
+                        if (!lucro) 
+                            for (i = 2; i >= 0; i--)
+                                if (vidas[i])  {
+                                    vidas[i] = false; // tira uma vida
+                                    break;
+                                }
                         break;
                     default:
                         break;
@@ -83,7 +94,7 @@ int main(void) {
             al_draw_bitmap(w0, 90, 20, 0);
             al_draw_bitmap(e0, 160, 20, 0);
             al_draw_bitmap(r0, 230, 20, 0);
-            button_monster_draw(&fila_botao);
+            button_monster_draw(&fila_botao, &fila_mortos);
 
             for (i = 0; i < 3; i++) {
                 if (vidas[i]) al_draw_scaled_bitmap(heart, 0, 0, 254, 254, 700 + i*30, 20, 25, 25, 0);
@@ -108,6 +119,7 @@ int main(void) {
     destroy_knight(jogador);
     destroy_audio(audio);
     destroy_queue(&fila_botao);
+    destroy_queue(&fila_mortos);
 
     return 0;
 }

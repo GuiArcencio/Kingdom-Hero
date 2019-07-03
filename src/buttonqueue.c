@@ -24,6 +24,7 @@ void add_queue(button_queue* q) {
     LETRA l = rand() % 4;
     novoMembro->elemento.letra = l;
     novoMembro->elemento.bPosY = 600;
+    novoMembro->elemento.alpha = 255;
     switch (l) {
         case Q:
             novoMembro->elemento.bBitmap = q->qBmp;
@@ -60,8 +61,15 @@ void pop_queue(button_queue* q) {
     }
 }
 
-void queue_update_pos(button_queue* q, float spd) {
-    membro_fila* p = q->head;
+void queue_update_pos(button_queue* q, button_queue* mortos, float spd, bool* vidas) {
+    membro_fila* p = mortos->head;
+    while (p != NULL) {
+        if (p->elemento.alpha <= 0) pop_queue(mortos);
+        else p->elemento.alpha -= 15;
+        p = p->prox;
+    }
+
+    p = q->head;
     if (p == NULL) return;
     if (p->elemento.bPosY <= -50) {
         pop_queue(q);
@@ -88,10 +96,72 @@ void destroy_queue(button_queue* q) {
     }
 }
 
-void button_monster_draw(button_queue* q) {
+void button_monster_draw(button_queue* q, button_queue* mortos) {
     membro_fila* p = q->head;
     while (p != NULL) {
         al_draw_bitmap(p->elemento.bBitmap, 20 + 70*(p->elemento.letra), p->elemento.bPosY, 0);
         p = p->prox;
+    }
+    p = mortos->head;
+    while (p != NULL) {
+        al_draw_tinted_bitmap(p->elemento.bBitmap, al_map_rgba(255, 255, 255, p->elemento.alpha), 20 + 70*(p->elemento.letra), p->elemento.bPosY, 0);
+        p = p->prox;
+    }
+}
+
+short check_acerto(button_queue* q, button_queue* mortos, int key) {
+    membro_fila* botao = q->head;
+    LETRA pressionada;
+    if (botao == NULL) return 0;
+
+    switch (key) {
+        case ALLEGRO_KEY_Q:
+            pressionada = Q;
+            break;
+        case ALLEGRO_KEY_W:
+            pressionada = W;
+            break;
+        case ALLEGRO_KEY_E:
+            pressionada = E;
+            break;
+        case ALLEGRO_KEY_R:
+            pressionada = R;
+            break;
+    }
+
+    if (pressionada == botao->elemento.letra) {
+        if (absolute(botao->elemento.bPosY - 20) <= 5) {
+            kill(q, mortos);
+            return 15;
+        }
+        else if (absolute(botao->elemento.bPosY - 20) <= 20) {
+            kill(q, mortos);
+            return 5;
+        }
+        else return 0;
+    } else return 0;
+}
+
+float absolute(float x) {
+    return (x >= 0 ? x : -x);
+}
+
+
+void kill(button_queue* q, button_queue* mortos) {
+    if (q->head != NULL) {
+        membro_fila* mortoMembro = (membro_fila*) malloc(sizeof(membro_fila));
+        if (mortoMembro == NULL) exit(1);
+        mortoMembro->prox = NULL;
+        mortoMembro->elemento = q->head->elemento;
+        pop_queue(q);
+
+        if (mortos->head == NULL) {
+            mortos->head = mortoMembro;
+            mortos->tail = mortoMembro;
+        }
+        else {
+            mortos->tail->prox = mortoMembro;
+            mortos->tail = mortoMembro;
+        }
     }
 }
