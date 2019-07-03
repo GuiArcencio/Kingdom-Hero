@@ -25,7 +25,7 @@ int main(void) {
     al_set_new_display_option(ALLEGRO_SAMPLES, 8, ALLEGRO_SUGGEST);
 
     ALLEGRO_DISPLAY* janela = al_create_display(SCREEN_W, SCREEN_H); // janela
-    al_set_window_title(janela, "Jogo daora");
+    al_set_window_title(janela, "Kingdom Hero");
     al_set_blender(ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA);
 
     ALLEGRO_FONT* fonte1 = al_load_font("./fonts/OpenSans-Bold.ttf", 28, ALLEGRO_ALIGN_CENTER);
