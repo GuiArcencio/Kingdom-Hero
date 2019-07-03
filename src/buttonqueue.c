@@ -6,6 +6,7 @@
 
 
 button_queue create_queue() {
+    srand(time(NULL));
     button_queue bq;
     bq.qBmp = al_load_bitmap("./assets/q.png");
     bq.wBmp = al_load_bitmap("./assets/w.png");
@@ -19,7 +20,6 @@ button_queue create_queue() {
 void add_queue(button_queue* q) {
     membro_fila* novoMembro = (membro_fila*) malloc(sizeof(membro_fila));
     if (novoMembro == NULL) exit(1);
-    srand(time(NULL));
     novoMembro->prox = NULL;
     LETRA l = rand() % 4;
     novoMembro->elemento.letra = l;
