@@ -23,7 +23,7 @@ int main(void) {
     al_register_event_source(fila_eventos, al_get_display_event_source(janela));
     al_register_event_source(fila_eventos, al_get_timer_event_source(timer));
 
-    ALLEGRO_BITMAP* background = al_load_bitmap("./assets/background.png");
+    ALLEGRO_BITMAP* background = al_load_bitmap("./assets/background2.png");
     ALLEGRO_BITMAP* q0 = al_load_bitmap("./assets/qa.png");
     ALLEGRO_BITMAP* w0 = al_load_bitmap("./assets/wa.png");
     ALLEGRO_BITMAP* e0 = al_load_bitmap("./assets/ea.png");
@@ -49,7 +49,7 @@ int main(void) {
         switch (evento.type) {
             case ALLEGRO_EVENT_TIMER:
                 knight_update_frame(jogador);
-                queue_update_pos(&fila_botao, 1.5);
+                queue_update_pos(&fila_botao, 2);
 
                 desenha = true;
                 break;
@@ -78,7 +78,7 @@ int main(void) {
         if (desenha && al_is_event_queue_empty(fila_eventos)) {
             al_clear_to_color(al_map_rgb(255, 255, 255));
 
-            al_draw_scaled_bitmap(background, 0, 0, 2048, 1546, 0, 0, SCREEN_W, SCREEN_H, 0);
+            al_draw_scaled_bitmap(background, 0, 0, 1067, 1080, 0, 0, SCREEN_W, SCREEN_H, 0);
             al_draw_bitmap(q0, 20, 20, 0);
             al_draw_bitmap(w0, 90, 20, 0);
             al_draw_bitmap(e0, 160, 20, 0);

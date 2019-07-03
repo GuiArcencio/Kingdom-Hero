@@ -48,7 +48,7 @@ void knight_update_frame(Knight* p) {
 }
 
 void knight_draw(Knight* p) {
-    al_draw_scaled_bitmap(p->currentBitmap, p->currentFrame * 180, 0, 180, 160, 300, 400, 180, 160, 0);
+    al_draw_scaled_bitmap(p->currentBitmap, p->currentFrame * 180, 0, 180, 160, 300, 300, 180, 160, 0);
 }
 
 void knight_attack(Knight* p, AudioHandler* a) {
