@@ -5,7 +5,7 @@
 typedef struct AudioHandler {
     ALLEGRO_SAMPLE* somEspada;
     ALLEGRO_AUDIO_STREAM* musica;
-    ALLEGRO_SAMPLE_ID idEspada;
+    ALLEGRO_SAMPLE_ID* idEspada;
 } AudioHandler;
 
 AudioHandler* audio_load();

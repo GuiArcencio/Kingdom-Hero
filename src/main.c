@@ -63,7 +63,7 @@ int main(void) {
         switch (evento.type) {
             case ALLEGRO_EVENT_TIMER:
                 knight_update_frame(jogador);
-                queue_update_pos(&fila_botao, &fila_mortos, 5, vidas);
+                queue_update_pos(&fila_botao, &fila_mortos, 2, vidas);
                 
                 desenha = true;
                 break;

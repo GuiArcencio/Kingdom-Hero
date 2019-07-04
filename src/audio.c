@@ -13,13 +13,15 @@ AudioHandler* audio_load() {
 
     handler->musica = NULL;
     handler->somEspada = al_load_sample("./sound/swoosh.wav");
+    handler->idEspada = NULL;
 
     return handler;
 }
 
 void audio_espada(AudioHandler* a) {
-    al_stop_sample(&a->idEspada);
-    al_play_sample(a->somEspada, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, &a->idEspada);
+    if (a->idEspada != NULL)
+        al_stop_sample(a->idEspada);
+    al_play_sample(a->somEspada, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, a->idEspada);
 }
 
 void destroy_audio(AudioHandler* a) {
