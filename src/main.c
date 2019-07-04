@@ -9,13 +9,17 @@
 #include "header/knight.h"
 #include "header/buttonqueue.h"
 #include "header/funcoes.h"
+#include "header/menu.h"
 
 #define SCREEN_W 800 // largura da tela
 #define SCREEN_H 600 // altura da tela
 
+typedef enum { MENU, JOGANDO } GAME_STATE;
+
 int main(void) {
     al_init();
     al_install_keyboard();
+    al_install_mouse();
     al_init_image_addon();
     al_init_font_addon();
     al_init_ttf_addon();
@@ -28,12 +32,14 @@ int main(void) {
     ALLEGRO_DISPLAY* janela = al_create_display(SCREEN_W, SCREEN_H); // janela
     al_set_window_title(janela, "Kingdom Hero");
     al_set_blender(ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA);
+    al_set_system_mouse_cursor(janela, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
 
     ALLEGRO_FONT* fonte1 = al_load_font("./fonts/OpenSans-Bold.ttf", 28, ALLEGRO_ALIGN_CENTER);
 
     al_register_event_source(fila_eventos, al_get_keyboard_event_source()); // registra as fontes de eventos na fila de eventos
     al_register_event_source(fila_eventos, al_get_display_event_source(janela));
     al_register_event_source(fila_eventos, al_get_timer_event_source(timer));
+    al_register_event_source(fila_eventos, al_get_mouse_event_source());
 
     ALLEGRO_BITMAP* background = al_load_bitmap("./assets/background2.png");
     ALLEGRO_BITMAP* q0 = al_load_bitmap("./assets/qa.png");
@@ -52,6 +58,10 @@ int main(void) {
     unsigned int pontos = 0;
     float velocidade = 1;
 
+    GAME_STATE estado = MENU;
+
+    Menu* menu = menu_create();
+
     Knight* jogador = create_knight();
     AudioHandler* audio = audio_load();
     button_queue fila_botao = create_queue();
@@ -64,9 +74,10 @@ int main(void) {
 
         switch (evento.type) {
             case ALLEGRO_EVENT_TIMER:
-                knight_update_frame(jogador);
-                queue_update_pos(&fila_botao, &fila_mortos, velocidade, vidas);
-                
+                if (estado == JOGANDO) {
+                    knight_update_frame(jogador);
+                    queue_update_pos(&fila_botao, &fila_mortos, velocidade, vidas);
+                }
                 desenha = true;
                 break;
             case ALLEGRO_EVENT_KEY_DOWN:
@@ -78,46 +89,59 @@ int main(void) {
                     case ALLEGRO_KEY_W:
                     case ALLEGRO_KEY_E:
                     case ALLEGRO_KEY_R:
-                        knight_attack(jogador, audio);
-                        lucro = check_acerto(&fila_botao, &fila_mortos, evento.keyboard.keycode);
-                        pontos += lucro;
-                        velocidade = aumentaVelocidade(pontos);
-                        if (!lucro) 
-                            for (i = 2; i >= 0; i--)
-                                if (vidas[i])  {
-                                    vidas[i] = false; // tira uma vida
-                                    break;
-                                }
+                        if (estado == JOGANDO) {
+                            knight_attack(jogador, audio);
+                            lucro = check_acerto(&fila_botao, &fila_mortos, evento.keyboard.keycode);
+                            pontos += lucro;
+                            velocidade = aumentaVelocidade(pontos);
+                            if (!lucro) 
+                                for (i = 2; i >= 0; i--)
+                                    if (vidas[i])  {
+                                        vidas[i] = false; // tira uma vida
+                                        break;
+                                    }
+                        }
                         break;
                     default:
                         break;
                 }
+                break;
+            case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
+                if (evento.mouse.button == 1)
+                    if (clique_iniciar(evento.mouse.x, evento.mouse.y))
+                        estado = JOGANDO;
                 break;
             case ALLEGRO_EVENT_DISPLAY_CLOSE:
                 sair = true;
                 break;
         }
 
-
+        
         // desenhar na tela
         if (desenha && al_is_event_queue_empty(fila_eventos)) {
             al_clear_to_color(al_map_rgb(255, 255, 255));
+             
+            switch (estado) {
+                case JOGANDO:
+                    al_draw_scaled_bitmap(background, 0, 0, 1067, 1080, 0, 0, SCREEN_W, SCREEN_H, 0);
+                    al_draw_bitmap(q0, 20, 20, 0);
+                    al_draw_bitmap(w0, 90, 20, 0);
+                    al_draw_bitmap(e0, 160, 20, 0);
+                    al_draw_bitmap(r0, 230, 20, 0);
+                    al_draw_textf(fonte1, al_map_rgb(0, 0, 0), 500, 560, 0, "Pontos: %u", pontos);
 
-            al_draw_scaled_bitmap(background, 0, 0, 1067, 1080, 0, 0, SCREEN_W, SCREEN_H, 0);
-            al_draw_bitmap(q0, 20, 20, 0);
-            al_draw_bitmap(w0, 90, 20, 0);
-            al_draw_bitmap(e0, 160, 20, 0);
-            al_draw_bitmap(r0, 230, 20, 0);
-            al_draw_textf(fonte1, al_map_rgb(0, 0, 0), 500, 560, 0, "Pontos: %u", pontos);
+                    button_monster_draw(&fila_botao, &fila_mortos);
 
-            button_monster_draw(&fila_botao, &fila_mortos);
+                    for (i = 0; i < 3; i++) {
+                        if (vidas[i]) al_draw_scaled_bitmap(heart, 0, 0, 254, 254, 700 + i*30, 20, 25, 25, 0);
+                    }
 
-            for (i = 0; i < 3; i++) {
-                if (vidas[i]) al_draw_scaled_bitmap(heart, 0, 0, 254, 254, 700 + i*30, 20, 25, 25, 0);
+                    knight_draw(jogador);
+                    break;
+                case MENU:
+                    menu_draw(menu);
+                    break;
             }
-
-            knight_draw(jogador);
-
             al_flip_display();
             desenha = false;
         }
@@ -137,6 +161,7 @@ int main(void) {
     destroy_queue(&fila_botao);
     destroy_queue(&fila_mortos);
     al_destroy_font(fonte1);
+    destroy_menu(menu);
 
     return 0;
 }
