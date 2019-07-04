@@ -8,6 +8,7 @@
 
 #include "header/knight.h"
 #include "header/buttonqueue.h"
+#include "header/funcoes.h"
 
 #define SCREEN_W 800 // largura da tela
 #define SCREEN_H 600 // altura da tela
@@ -49,6 +50,7 @@ int main(void) {
     bool vidas[3] = {true, true, true};
     short i, lucro = 0;
     unsigned int pontos = 0;
+    float velocidade = 1;
 
     Knight* jogador = create_knight();
     AudioHandler* audio = audio_load();
@@ -63,7 +65,7 @@ int main(void) {
         switch (evento.type) {
             case ALLEGRO_EVENT_TIMER:
                 knight_update_frame(jogador);
-                queue_update_pos(&fila_botao, &fila_mortos, 2, vidas);
+                queue_update_pos(&fila_botao, &fila_mortos, velocidade, vidas);
                 
                 desenha = true;
                 break;
@@ -79,6 +81,7 @@ int main(void) {
                         knight_attack(jogador, audio);
                         lucro = check_acerto(&fila_botao, &fila_mortos, evento.keyboard.keycode);
                         pontos += lucro;
+                        velocidade = aumentaVelocidade(pontos);
                         if (!lucro) 
                             for (i = 2; i >= 0; i--)
                                 if (vidas[i])  {

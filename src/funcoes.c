@@ -1,19 +1,16 @@
-#include <math.h>
+#include "header/funcoes.h"
+
 #include <stdio.h>
-float aumentaVelocidade(int pont){ //pont == pontuação
+#include <math.h>
 
-return sqrt(pont/100.0) + 1;
-
+float aumentaVelocidade(unsigned int pont){ //pont == pontuaï¿½ï¿½o
+    return sqrt(pont/100.0) + 1;
 }
-typedef struct player(){
-    char nome;
-    int pont;
-}Jogador;
 
-void salvaRanking(Jogador){ //Salva o nome e a pontuação em um arquivo
-    FILE *p = fopen("Ranking.txt")
+void salvaRanking(Jogador j){ //Salva o nome e a pontuaï¿½ï¿½o em um arquivo
+    FILE *p = fopen("Ranking.txt", "rb");
 }
-void main(){
+/*void main(){
     int n;
 
 
@@ -22,4 +19,4 @@ void main(){
         scanf("%i",&n);
         printf("Velocidade: %.7f\n\n\n\n", aumentaVelocidade(n));
     }while(n);
-}
+}*/
