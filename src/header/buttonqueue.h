@@ -14,6 +14,11 @@ typedef struct {
     LETRA letra;
     unsigned int alpha;
 
+    // Elementos referentes ao inimigo
+    ALLEGRO_BITMAP* iBitmap;
+    float iPosX;
+    unsigned short contFrames, currentFrame;
+
 } ButtonMonster;
 
 typedef struct membro_fila {
@@ -22,7 +27,7 @@ typedef struct membro_fila {
 } membro_fila;
 
 typedef struct {
-    ALLEGRO_BITMAP* qBmp, *wBmp, *eBmp, *rBmp;
+    ALLEGRO_BITMAP* qBmp, *wBmp, *eBmp, *rBmp, *inimBmp;
     membro_fila* head, *tail;
 } button_queue;
 

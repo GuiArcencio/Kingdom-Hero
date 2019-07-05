@@ -146,8 +146,6 @@ int main(void) {
             desenha = false;
         }
     }
-
-    al_destroy_display(janela);
     al_destroy_timer(timer);
     al_destroy_event_queue(fila_eventos);
     al_destroy_bitmap(background);
@@ -162,6 +160,8 @@ int main(void) {
     destroy_queue(&fila_mortos);
     al_destroy_font(fonte1);
     destroy_menu(menu);
+
+    al_destroy_display(janela);
 
     return 0;
 }

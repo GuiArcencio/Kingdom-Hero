@@ -12,6 +12,7 @@ button_queue create_queue() {
     bq.wBmp = al_load_bitmap("./assets/w.png");
     bq.eBmp = al_load_bitmap("./assets/e.png");
     bq.rBmp = al_load_bitmap("./assets/r.png");
+    bq.inimBmp = al_load_bitmap("./assets/bandit.png");
     bq.head = NULL;
     bq.tail = NULL;
     return bq;
@@ -39,6 +40,10 @@ void add_queue(button_queue* q) {
             novoMembro->elemento.bBitmap = q->rBmp;
             break;
     }
+
+    novoMembro->elemento.contFrames = novoMembro->elemento.contFrames = 0;
+    novoMembro->elemento.iBitmap = q->inimBmp;
+    novoMembro->elemento.iPosX = 800;
 
     if (q->head == NULL) {
         q->head = novoMembro;
@@ -72,11 +77,19 @@ void queue_update_pos(button_queue* q, button_queue* mortos, float spd, bool* vi
     p = q->head;
     if (p == NULL) return;
     if (p->elemento.bPosY <= -50) {
-        pop_queue(q);
+        kill(q, mortos);
         p = q->head;
     }
     do {
+
+        if (p->elemento.contFrames >= 8) {
+            p->elemento.currentFrame = (p->elemento.currentFrame + 1) % 7;
+            p->elemento.contFrames = 0;
+        } else p->elemento.contFrames++;
+
+
         p->elemento.bPosY -= spd;
+        p->elemento.iPosX = (85.0 / 116.0) * p->elemento.bPosY + (10450.0 / 29.0);
         p = p->prox;
     } while (p != NULL);
 
@@ -84,27 +97,31 @@ void queue_update_pos(button_queue* q, button_queue* mortos, float spd, bool* vi
 }
 
 void destroy_queue(button_queue* q) {
-    al_destroy_bitmap(q->qBmp);
-    al_destroy_bitmap(q->wBmp);
-    al_destroy_bitmap(q->eBmp);
-    al_destroy_bitmap(q->rBmp);
+
     membro_fila* p1 = q->head, *p2 = NULL;
     while (p1 != NULL) {
         p2 = p1->prox;
         free(p1);
         p1 = p2;
     }
+    al_destroy_bitmap(q->qBmp);
+    al_destroy_bitmap(q->wBmp);
+    al_destroy_bitmap(q->eBmp);
+    al_destroy_bitmap(q->rBmp);
+    al_destroy_bitmap(q->inimBmp);
 }
 
 void button_monster_draw(button_queue* q, button_queue* mortos) {
     membro_fila* p = q->head;
     while (p != NULL) {
         al_draw_bitmap(p->elemento.bBitmap, 20 + 70*(p->elemento.letra), p->elemento.bPosY, 0);
+        al_draw_scaled_bitmap(p->elemento.iBitmap, 48*(p->elemento.currentFrame), 48, 48, 48, p->elemento.iPosX, 340, 120, 120, 0);
         p = p->prox;
     }
     p = mortos->head;
     while (p != NULL) {
         al_draw_tinted_bitmap(p->elemento.bBitmap, al_map_rgba(255, 255, 255, p->elemento.alpha), 20 + 70*(p->elemento.letra), p->elemento.bPosY, 0);
+        al_draw_tinted_scaled_bitmap(p->elemento.iBitmap, al_map_rgba(255, 255, 255, p->elemento.alpha), 48*(p->elemento.currentFrame), 48, 48, 48, p->elemento.iPosX, 340, 120, 120, 0);
         p = p->prox;
     }
 }
