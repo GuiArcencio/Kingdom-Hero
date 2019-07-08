@@ -11,12 +11,12 @@ float aumentaVelocidade(unsigned int pont){ //pont == pontuação
 void salvaRanking(Jogador j){ //Salva o nome e a pontuação em um arquivo
     FILE *p = fopen("Ranking.bin", "rb+");
     int numJogadores;  //Registra o número de jogadores no ranking
-    if (p == NULL){
+    if (p == NULL){ //Cria um novo arquivo e salva os dados do jogador
         FILE *fp = fopen("Ranking.bin", "wb+");
         fwrite(1, sizeof(int), 1, fp);
         fwrite(j.nome,sizeof(char),3,fp);
         fwrite(j.pont,sizeof(int),1,fp);
-
+        fclose(fp);
     }else{
         int num = fread(numJogadores, sizeof(int), 1, p); // num recebe a quantidade de dados lida
         if((numJogadores < 5) || (num == 0))
@@ -37,6 +37,7 @@ void salvaRanking(Jogador j){ //Salva o nome e a pontuação em um arquivo
                 j.pont = jRanking[i].pont;
             }
         }
+        fclose(p);
     }
 }
 /*void main(){
