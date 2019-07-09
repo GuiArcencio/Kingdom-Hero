@@ -3,6 +3,8 @@
 #include <allegro5/allegro_native_dialog.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
 
 #include <stdio.h>
 
@@ -26,6 +28,8 @@ int main(void) {
     al_init_image_addon();
     al_init_font_addon();
     al_init_ttf_addon();
+    al_install_audio();
+    al_init_acodec_addon();
 
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / 60.0); // timer
     ALLEGRO_EVENT_QUEUE* fila_eventos = al_create_event_queue(); // fila de eventos
@@ -52,6 +56,8 @@ int main(void) {
     ALLEGRO_BITMAP* e0 = al_load_bitmap("./assets/ea.png");
     ALLEGRO_BITMAP* r0 = al_load_bitmap("./assets/ra.png");
     ALLEGRO_BITMAP* heart = al_load_bitmap("./assets/heart.png");
+    ALLEGRO_BITMAP* icon = al_load_bitmap("./assets/icon.png");
+    al_set_display_icon(janela, icon);
 
     bool sair = false;
     bool desenha = false;
@@ -94,9 +100,6 @@ int main(void) {
                 break;
             case ALLEGRO_EVENT_KEY_DOWN:
                 switch (evento.keyboard.keycode) {
-                    case ALLEGRO_KEY_ESCAPE:
-                        sair = true; 
-                        break;
                     case ALLEGRO_KEY_Q:
                     case ALLEGRO_KEY_W:
                     case ALLEGRO_KEY_E:
@@ -224,6 +227,7 @@ int main(void) {
     al_destroy_bitmap(e0);
     al_destroy_bitmap(r0);
     al_destroy_bitmap(heart);
+    al_destroy_bitmap(icon);
     destroy_knight(jogador);
     destroy_audio(audio);
     destroy_queue(&fila_botao);

@@ -7,8 +7,6 @@
 AudioHandler* audio_load() {
     AudioHandler* handler = (AudioHandler*) malloc(sizeof(AudioHandler));
     if (handler == NULL) exit(1);
-    al_install_audio();
-    al_init_acodec_addon();
     al_reserve_samples(5);
 
     handler->musica = NULL;
