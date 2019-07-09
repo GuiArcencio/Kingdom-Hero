@@ -27,7 +27,7 @@ void salvaRanking(Jogador j){ //Salva o nome e a pontuação em um arquivo
         jRanking[numJogadores-1] = j; // Copia o novo jogador para o array
         qsort(jRanking, numJogadores, sizeof(Jogador), compareJogador); // Ordenando o vetor
         rewind(p);
-        numJogadores = (numJogadores > 5 ? 5 : numJogadores);
+        numJogadores = (numJogadores > 5 ? 5 : numJogadores); // Escrevendo, no máximo, 5 jogadores do ranking no arquivo
         fwrite(&numJogadores, sizeof(int), 1, p);
         fwrite(jRanking, sizeof(Jogador), numJogadores, p);
         fclose(p);
@@ -50,13 +50,3 @@ int compareJogador(const void* jogador1, const void* jogador2) { // Compara a po
     const Jogador* j1 = (Jogador*) jogador1, *j2 = (Jogador*) jogador2;
     return ( j2->pont - j1->pont );
 }
-/*void main(){
-    int n;
-
-
-    do{
-        printf("Pontuacao = ");
-        scanf("%i",&n);
-        printf("Velocidade: %.7f\n\n\n\n", aumentaVelocidade(n));
-    }while(n);
-}*/

@@ -20,6 +20,7 @@ AudioHandler* audio_load() {
 }
 
 void audio_espada(AudioHandler* a) {
+    // Se um som de espada anterior foi tocado, cancele-o antes de tocar o próximo
     if (a->idEspada != NULL)
         al_stop_sample(a->idEspada);
     al_play_sample(a->somEspada, 1, 0, 1, ALLEGRO_PLAYMODE_ONCE, a->idEspada);
@@ -32,6 +33,7 @@ void destroy_audio(AudioHandler* a) {
 }
 
 void audio_musica(AudioHandler* a, bool tocar) {
+    // Se a música começar a tocar novamente, reinicie ela
     if (tocar) al_rewind_audio_stream(a->musica);
     al_set_audio_stream_playing(a->musica, tocar);
 }

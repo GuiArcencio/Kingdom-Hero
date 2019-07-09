@@ -109,13 +109,13 @@ int main(void) {
                             lucro = check_acerto(&fila_botao, &fila_mortos, evento.keyboard.keycode);
                             pontos += lucro;
                             velocidade = aumentaVelocidade(pontos);
-                            if (!lucro) 
+                            if (!lucro) // Se não acertou
                                 for (i = 2; i >= 0; i--)
                                     if (vidas[i])  {
                                         vidas[i] = false; // tira uma vida
                                         break;
                                     }
-                            if (!vidas[0]) {
+                            if (!vidas[0]) { // Se a última vida for perdida
                                 estado = PERDENDO;
                                 audio_musica(audio, false);
                             }
@@ -130,6 +130,7 @@ int main(void) {
                             estado = RANKING;
                             jRanking = loadRanking(&nRanking);
                         } else if (estado == RANKING) {
+                            // Começa o jogo de novo, resetando o que tem que resetar
                             empty_queue(&fila_botao);
                             empty_queue(&fila_mortos);
                             add_queue(&fila_botao);

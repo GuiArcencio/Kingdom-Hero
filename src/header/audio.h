@@ -8,9 +8,9 @@ typedef struct AudioHandler {
     ALLEGRO_SAMPLE_ID* idEspada;
 } AudioHandler;
 
-AudioHandler* audio_load();
-void audio_espada(AudioHandler* a);
+AudioHandler* audio_load(); // Inicializar audio
+void audio_espada(AudioHandler* a); // Tocar o som da espada
 
-void audio_musica(AudioHandler* a, bool tocar);
+void audio_musica(AudioHandler* a, bool tocar); // Parar ou recomeçar a música
 
-void destroy_audio(AudioHandler* a);
+void destroy_audio(AudioHandler* a); // Destruir o audio

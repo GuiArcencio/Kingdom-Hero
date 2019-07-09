@@ -21,6 +21,6 @@ void como_jogar_draw(ComoJogar* m);
 
 void destroy_como_jogar(ComoJogar* m);
 
-bool clique_iniciar2(int x, int y);
+bool clique_iniciar2(int x, int y); // Verifica se o mouse está em cima do botão de iniciar
 
-bool clique_menu(int x, int y);
+bool clique_menu(int x, int y); // Verifica se o mouse está em cima do botão de menu
