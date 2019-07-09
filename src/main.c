@@ -3,6 +3,8 @@
 #include <allegro5/allegro_native_dialog.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_audio.h>
+#include <allegro5/allegro_acodec.h>
 
 #include <stdio.h>
 
@@ -10,11 +12,14 @@
 #include "header/buttonqueue.h"
 #include "header/funcoes.h"
 #include "header/menu.h"
+#include "header/comojogar.h"
 
 #define SCREEN_W 800 // largura da tela
 #define SCREEN_H 600 // altura da tela
 
-typedef enum { MENU, JOGANDO } GAME_STATE;
+typedef enum { MENU, JOGANDO, PERDENDO, OVER, RANKING, COMOJOGAR } GAME_STATE;
+
+void escreverNome(char str[4], int letra);
 
 int main(void) {
     al_init();
@@ -23,6 +28,8 @@ int main(void) {
     al_init_image_addon();
     al_init_font_addon();
     al_init_ttf_addon();
+    al_install_audio();
+    al_init_acodec_addon();
 
     ALLEGRO_TIMER* timer = al_create_timer(1.0 / 60.0); // timer
     ALLEGRO_EVENT_QUEUE* fila_eventos = al_create_event_queue(); // fila de eventos
@@ -34,7 +41,9 @@ int main(void) {
     al_set_blender(ALLEGRO_ADD, ALLEGRO_ALPHA, ALLEGRO_INVERSE_ALPHA);
     al_set_system_mouse_cursor(janela, ALLEGRO_SYSTEM_MOUSE_CURSOR_DEFAULT);
 
-    ALLEGRO_FONT* fonte1 = al_load_font("./fonts/OpenSans-Bold.ttf", 28, ALLEGRO_ALIGN_CENTER);
+    ALLEGRO_FONT* fonte1 = al_load_font("./fonts/OpenSans-Bold.ttf", 28, 0);
+    ALLEGRO_FONT* fonte2 = al_load_font("./fonts/OpenSans-Bold.ttf", 48, 0);
+    ALLEGRO_FONT* fonte3 = al_load_font("./fonts/OpenSans-Bold.ttf", 90, 0);
 
     al_register_event_source(fila_eventos, al_get_keyboard_event_source()); // registra as fontes de eventos na fila de eventos
     al_register_event_source(fila_eventos, al_get_display_event_source(janela));
@@ -47,6 +56,8 @@ int main(void) {
     ALLEGRO_BITMAP* e0 = al_load_bitmap("./assets/ea.png");
     ALLEGRO_BITMAP* r0 = al_load_bitmap("./assets/ra.png");
     ALLEGRO_BITMAP* heart = al_load_bitmap("./assets/heart.png");
+    ALLEGRO_BITMAP* icon = al_load_bitmap("./assets/icon.png");
+    al_set_display_icon(janela, icon);
 
     bool sair = false;
     bool desenha = false;
@@ -57,10 +68,14 @@ int main(void) {
     short i, lucro = 0;
     unsigned int pontos = 0;
     float velocidade = 1;
+    char jNome[4] = "___";
 
     GAME_STATE estado = MENU;
+    Jogador* jRanking = NULL;
+    int nRanking;
 
     Menu* menu = menu_create();
+    ComoJogar* como = como_jogar_create();
 
     Knight* jogador = create_knight();
     AudioHandler* audio = audio_load();
@@ -68,23 +83,23 @@ int main(void) {
     button_queue fila_mortos = create_queue();
     add_queue(&fila_botao);
 
+
     al_start_timer(timer);
     while (!sair) {
         al_wait_for_event(fila_eventos, &evento);
-
         switch (evento.type) {
             case ALLEGRO_EVENT_TIMER:
                 if (estado == JOGANDO) {
                     knight_update_frame(jogador);
-                    queue_update_pos(&fila_botao, &fila_mortos, velocidade, vidas);
-                }
+                    queue_update_pos(&fila_botao, &fila_mortos, velocidade);
+                } else if (estado == PERDENDO) {
+                    if (!knight_die(jogador)) estado = OVER;
+                    queue_update_pos(&fila_botao, &fila_mortos, velocidade);
+                } 
                 desenha = true;
                 break;
             case ALLEGRO_EVENT_KEY_DOWN:
                 switch (evento.keyboard.keycode) {
-                    case ALLEGRO_KEY_ESCAPE:
-                        sair = true; 
-                        break;
                     case ALLEGRO_KEY_Q:
                     case ALLEGRO_KEY_W:
                     case ALLEGRO_KEY_E:
@@ -94,23 +109,67 @@ int main(void) {
                             lucro = check_acerto(&fila_botao, &fila_mortos, evento.keyboard.keycode);
                             pontos += lucro;
                             velocidade = aumentaVelocidade(pontos);
-                            if (!lucro) 
+                            if (!lucro) // Se não acertou
                                 for (i = 2; i >= 0; i--)
                                     if (vidas[i])  {
                                         vidas[i] = false; // tira uma vida
                                         break;
                                     }
+                            if (!vidas[0]) { // Se a última vida for perdida
+                                estado = PERDENDO;
+                                audio_musica(audio, false);
+                            }
                         }
                         break;
-                    default:
+                    case ALLEGRO_KEY_ENTER:
+                        if (estado == OVER && jNome[2] != '_') {
+                            Jogador j;
+                            strcpy(j.nome, jNome);
+                            j.pont = pontos;
+                            salvaRanking(j);
+                            estado = RANKING;
+                            jRanking = loadRanking(&nRanking);
+                        } else if (estado == RANKING) {
+                            // Começa o jogo de novo, resetando o que tem que resetar
+                            empty_queue(&fila_botao);
+                            empty_queue(&fila_mortos);
+                            add_queue(&fila_botao);
+                            pontos = 0;
+                            strcpy(jNome, "___");
+                            vidas[0] = vidas[1] = vidas[2] = true;
+                            velocidade = 1;
+                            jogador->alpha = 255;
+                            jogador->state = IDLE;
+                            jogador->currentBitmap = jogador->idleBitmap;
+                            jogador->contFrame = jogador->currentFrame = 0;
+                            estado = MENU;
+                            audio_musica(audio, true);
+                        }
                         break;
+                    default: break;
                 }
                 break;
             case ALLEGRO_EVENT_MOUSE_BUTTON_UP:
-                if (evento.mouse.button == 1)
-                    if (clique_iniciar(evento.mouse.x, evento.mouse.y))
-                        estado = JOGANDO;
+                switch (estado) {
+                    case MENU:
+                        if (evento.mouse.button == 1)
+                            if (clique_iniciar(evento.mouse.x, evento.mouse.y))
+                                estado = JOGANDO;
+                            else if (clique_como_jogar(evento.mouse.x, evento.mouse.y))
+                                estado = COMOJOGAR;
+                        break;
+                    case COMOJOGAR:
+                        if (evento.mouse.button == 1) 
+                            if (clique_iniciar2(evento.mouse.x, evento.mouse.y))
+                                estado = JOGANDO;
+                            else if (clique_menu(evento.mouse.x, evento.mouse.y))
+                                estado = MENU;
+                    default: break;
+                }
                 break;
+            case ALLEGRO_EVENT_KEY_CHAR:
+                if (estado == OVER) escreverNome(jNome, evento.keyboard.keycode);
+                    break;
             case ALLEGRO_EVENT_DISPLAY_CLOSE:
                 sair = true;
                 break;
@@ -119,16 +178,17 @@ int main(void) {
         
         // desenhar na tela
         if (desenha && al_is_event_queue_empty(fila_eventos)) {
-            al_clear_to_color(al_map_rgb(255, 255, 255));
+            al_clear_to_color(al_map_rgb(25, 39, 61));
              
             switch (estado) {
                 case JOGANDO:
+                case PERDENDO:
                     al_draw_scaled_bitmap(background, 0, 0, 1067, 1080, 0, 0, SCREEN_W, SCREEN_H, 0);
                     al_draw_bitmap(q0, 20, 20, 0);
                     al_draw_bitmap(w0, 90, 20, 0);
                     al_draw_bitmap(e0, 160, 20, 0);
                     al_draw_bitmap(r0, 230, 20, 0);
-                    al_draw_textf(fonte1, al_map_rgb(0, 0, 0), 500, 560, 0, "Pontos: %u", pontos);
+                    al_draw_textf(fonte1, al_map_rgb(0, 0, 0), 500, 560, ALLEGRO_ALIGN_CENTRE, "Pontos: %u", pontos);
 
                     button_monster_draw(&fila_botao, &fila_mortos);
 
@@ -140,6 +200,24 @@ int main(void) {
                     break;
                 case MENU:
                     menu_draw(menu);
+                    break;
+                case COMOJOGAR:
+                    como_jogar_draw(como);
+                    break;
+                case OVER:
+                    al_draw_multiline_text(fonte2, al_map_rgb(255, 255, 255), 400, 50, 600, 70, ALLEGRO_ALIGN_CENTRE, "Você perdeu! Digite seu nome e pressione enter para entrar no ranking:");
+                    al_draw_text(fonte3, al_map_rgb(255, 255, 255), 400, 350, ALLEGRO_ALIGN_CENTRE, jNome);
+                    break;
+                case RANKING:
+                    al_draw_text(fonte2, al_map_rgb(255, 255, 255), 50, 50, 0, "Ranking");
+                    al_draw_text(fonte1, al_map_rgb(255, 255, 255), 590, 550, ALLEGRO_ALIGN_CENTRE, "(pressione enter para voltar)");
+                    short i;
+                    for (i = 0; i < 5; i++) {
+                        if (i < nRanking) 
+                            al_draw_textf(fonte2, al_map_rgb(255, 255, 255), 200, 150 + i*50, 0, "%i: %s - %u", i+1, jRanking[i].nome, jRanking[i].pont);
+                        else
+                            al_draw_textf(fonte2, al_map_rgb(255, 255, 255), 200, 150 + i*50, 0, "%i:", i+1);
+                    }
                     break;
             }
             al_flip_display();
@@ -154,14 +232,39 @@ int main(void) {
     al_destroy_bitmap(e0);
     al_destroy_bitmap(r0);
     al_destroy_bitmap(heart);
+    al_destroy_bitmap(icon);
     destroy_knight(jogador);
     destroy_audio(audio);
     destroy_queue(&fila_botao);
     destroy_queue(&fila_mortos);
     al_destroy_font(fonte1);
     destroy_menu(menu);
+    destroy_como_jogar(como);
 
     al_destroy_display(janela);
 
     return 0;
+}
+
+void escreverNome(char str[4], int letra) {
+    short i;
+    if (letra >= ALLEGRO_KEY_A && letra <= ALLEGRO_KEY_Z) {
+        for (i = 0; i < 3; i++)
+            if (str[i] == '_') {
+                str[i] = al_keycode_to_name(letra)[0] - 32;
+                break;
+            }
+    } else if (letra >= ALLEGRO_KEY_0 && letra <= ALLEGRO_KEY_9) {
+        for (i = 0; i < 3; i++)
+            if (str[i] == '_') {
+                str[i] = al_keycode_to_name(letra)[0];
+                break;
+            }
+    } else if (letra == ALLEGRO_KEY_BACKSPACE) {
+        for (i = 2; i >= 0; i--)
+            if (str[i] != '_') {
+                str[i] = '_';
+                break;
+            }   
+    }
 }
