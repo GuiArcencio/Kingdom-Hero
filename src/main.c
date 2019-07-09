@@ -63,7 +63,7 @@ int main(void) {
     bool desenha = false;
 
     ALLEGRO_EVENT evento;
-    
+
     bool vidas[3] = {true, true, true};
     short i, lucro = 0;
     unsigned int pontos = 0;
@@ -95,7 +95,7 @@ int main(void) {
                 } else if (estado == PERDENDO) {
                     if (!knight_die(jogador)) estado = OVER;
                     queue_update_pos(&fila_botao, &fila_mortos, velocidade);
-                } 
+                }
                 desenha = true;
                 break;
             case ALLEGRO_EVENT_KEY_DOWN:
@@ -159,7 +159,7 @@ int main(void) {
                                 estado = COMOJOGAR;
                         break;
                     case COMOJOGAR:
-                        if (evento.mouse.button == 1) 
+                        if (evento.mouse.button == 1)
                             if (clique_iniciar2(evento.mouse.x, evento.mouse.y))
                                 estado = JOGANDO;
                             else if (clique_menu(evento.mouse.x, evento.mouse.y))
@@ -175,11 +175,11 @@ int main(void) {
                 break;
         }
 
-        
+
         // desenhar na tela
         if (desenha && al_is_event_queue_empty(fila_eventos)) {
             al_clear_to_color(al_map_rgb(25, 39, 61));
-             
+
             switch (estado) {
                 case JOGANDO:
                 case PERDENDO:
@@ -213,7 +213,7 @@ int main(void) {
                     al_draw_text(fonte1, al_map_rgb(255, 255, 255), 590, 550, ALLEGRO_ALIGN_CENTRE, "(pressione enter para voltar)");
                     short i;
                     for (i = 0; i < 5; i++) {
-                        if (i < nRanking) 
+                        if (i < nRanking)
                             al_draw_textf(fonte2, al_map_rgb(255, 255, 255), 200, 150 + i*50, 0, "%i: %s - %u", i+1, jRanking[i].nome, jRanking[i].pont);
                         else
                             al_draw_textf(fonte2, al_map_rgb(255, 255, 255), 200, 150 + i*50, 0, "%i:", i+1);
@@ -265,6 +265,6 @@ void escreverNome(char str[4], int letra) {
             if (str[i] != '_') {
                 str[i] = '_';
                 break;
-            }   
+            }
     }
 }
