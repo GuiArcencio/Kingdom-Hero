@@ -1,4 +1,4 @@
--#include "header/funcoes.h"
+#include "header/funcoes.h"
 
 #include <stdio.h>
 #include <math.h>
