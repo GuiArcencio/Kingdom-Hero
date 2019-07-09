@@ -10,11 +10,12 @@
 #include "header/buttonqueue.h"
 #include "header/funcoes.h"
 #include "header/menu.h"
+#include "header/comojogar.h"
 
 #define SCREEN_W 800 // largura da tela
 #define SCREEN_H 600 // altura da tela
 
-typedef enum { MENU, JOGANDO, PERDENDO, OVER, RANKING} GAME_STATE;
+typedef enum { MENU, JOGANDO, PERDENDO, OVER, RANKING, COMOJOGAR } GAME_STATE;
 
 void escreverNome(char str[4], int letra);
 
@@ -68,6 +69,7 @@ int main(void) {
     int nRanking;
 
     Menu* menu = menu_create();
+    ComoJogar* como = como_jogar_create();
 
     Knight* jogador = create_knight();
     AudioHandler* audio = audio_load();
@@ -145,7 +147,15 @@ int main(void) {
                         if (evento.mouse.button == 1)
                             if (clique_iniciar(evento.mouse.x, evento.mouse.y))
                                 estado = JOGANDO;
+                            else if (clique_como_jogar(evento.mouse.x, evento.mouse.y))
+                                estado = COMOJOGAR;
                         break;
+                    case COMOJOGAR:
+                        if (evento.mouse.button == 1) 
+                            if (clique_iniciar2(evento.mouse.x, evento.mouse.y))
+                                estado = JOGANDO;
+                            else if (clique_menu(evento.mouse.x, evento.mouse.y))
+                                estado = MENU;
                     default: break;
                 }
                 break;
@@ -183,18 +193,22 @@ int main(void) {
                 case MENU:
                     menu_draw(menu);
                     break;
+                case COMOJOGAR:
+                    como_jogar_draw(como);
+                    break;
                 case OVER:
                     al_draw_multiline_text(fonte2, al_map_rgb(255, 255, 255), 400, 50, 600, 70, ALLEGRO_ALIGN_CENTRE, "Você perdeu! Digite seu nome e pressione enter para entrar no ranking:");
                     al_draw_text(fonte3, al_map_rgb(255, 255, 255), 400, 350, ALLEGRO_ALIGN_CENTRE, jNome);
                     break;
                 case RANKING:
-                    al_draw_text(fonte2, al_map_rgb(255, 255, 255), 50, 50, 0, "Ranking (pressione enter para sair)");
+                    al_draw_text(fonte2, al_map_rgb(255, 255, 255), 50, 50, 0, "Ranking");
+                    al_draw_text(fonte1, al_map_rgb(255, 255, 255), 590, 550, ALLEGRO_ALIGN_CENTRE, "(pressione enter para voltar)");
                     short i;
                     for (i = 0; i < 5; i++) {
                         if (i < nRanking) 
-                            al_draw_textf(fonte2, al_map_rgb(255, 255, 255), 200, 150 + i*50, 0, "%i: %s - %u", i, jRanking[i].nome, jRanking[i].pont);
+                            al_draw_textf(fonte2, al_map_rgb(255, 255, 255), 200, 150 + i*50, 0, "%i: %s - %u", i+1, jRanking[i].nome, jRanking[i].pont);
                         else
-                            al_draw_textf(fonte2, al_map_rgb(255, 255, 255), 200, 150 + i*50, 0, "%i:", i);
+                            al_draw_textf(fonte2, al_map_rgb(255, 255, 255), 200, 150 + i*50, 0, "%i:", i+1);
                     }
                     break;
             }
@@ -216,6 +230,7 @@ int main(void) {
     destroy_queue(&fila_mortos);
     al_destroy_font(fonte1);
     destroy_menu(menu);
+    destroy_como_jogar(como);
 
     al_destroy_display(janela);
 

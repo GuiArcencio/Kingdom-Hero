@@ -4,12 +4,11 @@
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
 
-#include "comojogar.h"
+#include "header/comojogar.h"
 
 ComoJogar* como_jogar_create(){
     ComoJogar* comojogar = (ComoJogar*) malloc(sizeof(ComoJogar));
     if (comojogar == NULL) exit(1);
-    al_init_primitives_addon();
     comojogar->background = al_load_bitmap("./assets/background3.jpeg");//carregando o background
     comojogar->botaoQ = al_load_bitmap("./assets/q.png");
     comojogar->botaoW = al_load_bitmap("./assets/w.png");
@@ -22,7 +21,7 @@ ComoJogar* como_jogar_create(){
     return comojogar;
 }
 
-void destroy_menu(ComoJogar* m) {
+void destroy_como_jogar(ComoJogar* m) {
     al_destroy_bitmap(m->background);
     al_destroy_bitmap(m->botaoQ);
     al_destroy_bitmap(m->botaoW);
@@ -59,7 +58,7 @@ void como_jogar_draw(ComoJogar* m){
     al_draw_text(m->fonteComandos,al_map_rgb_f(1,1,1),640,525,0,"Iniciar");
 }
 
-bool clique_iniciar(int x, int y){
+bool clique_iniciar2(int x, int y){
     return (x>=600 && x<=760 && y>=500 && y<=550);
 }
 
@@ -83,7 +82,7 @@ bool clique_menu(int x, int y){
     ALLEGRO_FONT *Titulo = al_load_font("C:\\Users\\matte\\Downloads\\celtic\\Celtic.ttf", 80, 0);
     ALLEGRO_FONT *texto = al_load_font("C:\\Users\\matte\\Downloads\\celtic\\Celtic.ttf", 25, 0);
     ALLEGRO_FONT *comandos = al_load_font("C:\\Users\\matte\\Downloads\\celtic\\Celtic.ttf", 35, 0);
-    ALLEGRO_DISPLAY* janela = al_create_display(800, 600);//Cria o display em que será mostrado como jogar
+    ALLEGRO_DISPLAY* janela = al_create_display(800, 600);//Cria o display em que serï¿½ mostrado como jogar
     ALLEGRO_EVENT_QUEUE *events = NULL;
 
     background = al_load_bitmap("C:\\Users\\matte\\Documents\\Matteus\\background3.jpeg");//carregando o background
@@ -143,7 +142,7 @@ bool clique_menu(int x, int y){
              al_draw_bitmap(botaoR,510, 230,0);
 
              al_draw_text(texto, al_map_rgb(255,255,255),400, 300, ALLEGRO_ALIGN_CENTRE,"Para pontuar voce deve acertar os botoes em seus devidos tempos");
-             al_draw_text(texto, al_map_rgb(255,255,255),400, 340, ALLEGRO_ALIGN_CENTRE,"Se voce acertar com perfeição se ganha quinze pontos");
+             al_draw_text(texto, al_map_rgb(255,255,255),400, 340, ALLEGRO_ALIGN_CENTRE,"Se voce acertar com perfeiï¿½ï¿½o se ganha quinze pontos");
              al_draw_text(texto, al_map_rgb(255,255,255),400, 380, ALLEGRO_ALIGN_CENTRE,"Se nao se ganha cinco pontos");
              al_draw_text(texto, al_map_rgb(255,255,255),400, 420, ALLEGRO_ALIGN_CENTRE,"Se voce nobre cavaleiro errar perdera um coracao");
              al_draw_text(texto, al_map_rgb(255,255,255),400, 460, ALLEGRO_ALIGN_CENTRE,"Se voce perder os tres coracoes seu castelo sera dominado e voce perde o jogo");
