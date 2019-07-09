@@ -17,3 +17,5 @@ Menu* menu_create();
 void destroy_menu(Menu* m);
 
 bool clique_iniciar(int x, int y);
+
+bool clique_como_jogar(int x, int y);

@@ -38,6 +38,10 @@ bool clique_iniciar(int x, int y) {
     return (x >= 320 && x <= 480 && y >= 450 && y <= 500);
 }
 
+bool clique_como_jogar(int x, int y){
+    return (x >= 320 && x <= 480 && y >= 350 && y <= 400);
+}
+
 /* int main(void)
 {
 
