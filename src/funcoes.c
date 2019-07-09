@@ -1,5 +1,5 @@
 #include "header/funcoes.h"
-
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
@@ -23,7 +23,19 @@ void salvaRanking(Jogador j){ //Salva o nome e a pontuação em um arquivo
         numJogadores++;
         Jogador* jRanking = (Jogador*) malloc(numJogadores*sizeof(Jogador)); //Jogadores que já estão no ranking
         if (jRanking == NULL) exit(1);
-        fread(jRanking, sizeof(Jogador), numJogadores-1, p);
+        int i;
+        _Bool igual = 0;
+        for(i = 0; i < numJogadores-1; i++){
+             fread(jRanking, sizeof(Jogador), 1, p);
+             if(strcmp(jRanking[i].nome,j.nome) == 0){
+                igual = 1;
+                if(j.pont > jRanking[i].pont){
+                    jRanking[i] = j;
+                    numJogadores--;
+                }
+             }
+        }
+        if(igual == 0){
         jRanking[numJogadores-1] = j; // Copia o novo jogador para o array
         qsort(jRanking, numJogadores, sizeof(Jogador), compareJogador); // Ordenando o vetor
         rewind(p);
@@ -33,6 +45,16 @@ void salvaRanking(Jogador j){ //Salva o nome e a pontuação em um arquivo
         fclose(p);
 
         free(jRanking);
+        }else{
+        qsort(jRanking, numJogadores, sizeof(Jogador), compareJogador); // Ordenando o vetor
+        rewind(p);
+        numJogadores = (numJogadores > 5 ? 5 : numJogadores); // Escrevendo, no máximo, 5 jogadores do ranking no arquivo
+        fwrite(&numJogadores, sizeof(int), 1, p);
+        fwrite(jRanking, sizeof(Jogador), numJogadores, p);
+        fclose(p);
+
+        free(jRanking);
+        }
     }
 }
 
