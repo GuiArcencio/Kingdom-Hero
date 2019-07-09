@@ -11,4 +11,6 @@ typedef struct AudioHandler {
 AudioHandler* audio_load();
 void audio_espada(AudioHandler* a);
 
+void audio_musica(AudioHandler* a, bool tocar);
+
 void destroy_audio(AudioHandler* a);

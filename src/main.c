@@ -115,7 +115,10 @@ int main(void) {
                                         vidas[i] = false; // tira uma vida
                                         break;
                                     }
-                            if (!vidas[0]) estado = PERDENDO;
+                            if (!vidas[0]) {
+                                estado = PERDENDO;
+                                audio_musica(audio, false);
+                            }
                         }
                         break;
                     case ALLEGRO_KEY_ENTER:
@@ -139,6 +142,7 @@ int main(void) {
                             jogador->currentBitmap = jogador->idleBitmap;
                             jogador->contFrame = jogador->currentFrame = 0;
                             estado = MENU;
+                            audio_musica(audio, true);
                         }
                         break;
                     default: break;
