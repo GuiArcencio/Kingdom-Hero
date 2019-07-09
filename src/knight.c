@@ -11,6 +11,7 @@ Knight* create_knight() {
     jogador->attackBitmap = al_load_bitmap("./assets/knightattack.png");
     jogador->currentBitmap = jogador->idleBitmap;
     jogador->state = IDLE;
+    jogador->alpha = 255;
 
     return jogador;
 }
@@ -48,7 +49,7 @@ void knight_update_frame(Knight* p) {
 }
 
 void knight_draw(Knight* p) {
-    al_draw_scaled_bitmap(p->currentBitmap, p->currentFrame * 180, 0, 180, 160, 300, 300, 180, 160, 0);
+    al_draw_tinted_scaled_bitmap(p->currentBitmap, al_map_rgba(255, 255, 255, p->alpha),p->currentFrame * 180, 0, 180, 160, 300, 300, 180, 160, 0);
 }
 
 void knight_attack(Knight* p, AudioHandler* a) {
@@ -58,4 +59,9 @@ void knight_attack(Knight* p, AudioHandler* a) {
         p->contFrame = p->currentFrame = 0;
         audio_espada(a);
     }
+}
+
+char knight_die(Knight* p) {
+    if (p->alpha > 0) p->alpha -= 3;
+    return p->alpha;
 }

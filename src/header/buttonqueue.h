@@ -12,7 +12,7 @@ typedef struct {
     ALLEGRO_BITMAP* bBitmap;
     float bPosY;
     LETRA letra;
-    unsigned int alpha;
+    unsigned char alpha;
 
     // Elementos referentes ao inimigo
     ALLEGRO_BITMAP* iBitmap;
@@ -37,7 +37,7 @@ void add_queue(button_queue* q);
 
 void pop_queue(button_queue* q);
 
-void queue_update_pos(button_queue* q, button_queue* mortos, float spd, bool* vidas);
+void queue_update_pos(button_queue* q, button_queue* mortos, float spd);
 
 void destroy_queue(button_queue* q);
 
@@ -46,5 +46,7 @@ void button_monster_draw(button_queue* q, button_queue* mortos);
 short check_acerto(button_queue* q, button_queue* mortos, int key); // Verifica o tanto de pontos ganhos
 
 float absolute(float x);
+
+void empty_queue(button_queue* q);
 
 void kill(button_queue* q, button_queue* mortos);

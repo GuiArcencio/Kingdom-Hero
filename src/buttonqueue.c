@@ -66,7 +66,7 @@ void pop_queue(button_queue* q) {
     }
 }
 
-void queue_update_pos(button_queue* q, button_queue* mortos, float spd, bool* vidas) {
+void queue_update_pos(button_queue* q, button_queue* mortos, float spd) {
     membro_fila* p = mortos->head;
     while (p != NULL) {
         if (p->elemento.alpha <= 0) pop_queue(mortos);
@@ -82,7 +82,7 @@ void queue_update_pos(button_queue* q, button_queue* mortos, float spd, bool* vi
     }
     do {
 
-        if (p->elemento.contFrames >= 8) {
+        if (p->elemento.contFrames >= 7) {
             p->elemento.currentFrame = (p->elemento.currentFrame + 1) % 7;
             p->elemento.contFrames = 0;
         } else p->elemento.contFrames++;
@@ -97,18 +97,22 @@ void queue_update_pos(button_queue* q, button_queue* mortos, float spd, bool* vi
 }
 
 void destroy_queue(button_queue* q) {
+    empty_queue(q);
+    al_destroy_bitmap(q->qBmp);
+    al_destroy_bitmap(q->wBmp);
+    al_destroy_bitmap(q->eBmp);
+    al_destroy_bitmap(q->rBmp);
+    al_destroy_bitmap(q->inimBmp);
+}
 
+void empty_queue(button_queue* q) {
     membro_fila* p1 = q->head, *p2 = NULL;
     while (p1 != NULL) {
         p2 = p1->prox;
         free(p1);
         p1 = p2;
     }
-    al_destroy_bitmap(q->qBmp);
-    al_destroy_bitmap(q->wBmp);
-    al_destroy_bitmap(q->eBmp);
-    al_destroy_bitmap(q->rBmp);
-    al_destroy_bitmap(q->inimBmp);
+    q->head = q->tail = NULL;
 }
 
 void button_monster_draw(button_queue* q, button_queue* mortos) {
