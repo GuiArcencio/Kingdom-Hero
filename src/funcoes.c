@@ -1,9 +1,9 @@
 #include "header/funcoes.h"
-#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
+#include <allegro5/allegro.h>
 
 float aumentaVelocidade(unsigned int pont){ //pont == pontuação
     return sqrt(pont/100.0) + 1;
@@ -29,6 +29,7 @@ void salvaRanking(Jogador j){ //Salva o nome e a pontuação em um arquivo
         for (i = 0; i < numJogadores-1; i++) {
             if (!strcmp(jRanking[i].nome, j.nome)) {
                 jaExiste = true;
+                jRanking[i].pont = j.pont;
                 break;
             }
         }
@@ -42,7 +43,6 @@ void salvaRanking(Jogador j){ //Salva o nome e a pontuação em um arquivo
             fclose(p);
         } else {
             numJogadores--;
-            jRanking[i] = j;
             qsort(jRanking, numJogadores, sizeof(Jogador), compareJogador); // Ordenando o vetor
             rewind(p);
             numJogadores = (numJogadores > 5 ? 5 : numJogadores); // Escrevendo, no máximo, 5 jogadores do ranking no arquivo
