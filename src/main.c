@@ -1,4 +1,4 @@
-#include <allegro5/allegro5.h>
+﻿#include <allegro5/allegro5.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_native_dialog.h>
 #include <allegro5/allegro_font.h>
@@ -205,8 +205,11 @@ int main(void) {
                     como_jogar_draw(como);
                     break;
                 case OVER:
-                    al_draw_multiline_text(fonte2, al_map_rgb(255, 255, 255), 400, 50, 600, 70, ALLEGRO_ALIGN_CENTRE, "Você perdeu! Digite seu nome e pressione enter para entrar no ranking:");
-                    al_draw_text(fonte3, al_map_rgb(255, 255, 255), 400, 350, ALLEGRO_ALIGN_CENTRE, jNome);
+                    //al_draw_multiline_text(fonte2, al_map_rgb(255, 255, 255), 400, 50, 600, 70, ALLEGRO_ALIGN_CENTRE, "Você perdeu! Digite seu nome e pressione enter para entrar no ranking:");
+                    al_draw_text(fonte2, al_map_rgb(255, 255, 255), 400, 50, ALLEGRO_ALIGN_CENTRE, "Você perdeu! Digite seu");
+		    al_draw_text(fonte2, al_map_rgb(255, 255, 255), 400, 120, ALLEGRO_ALIGN_CENTRE, "nome para entrar no");
+		    al_draw_text(fonte2, al_map_rgb(255, 255, 255), 400, 190, ALLEGRO_ALIGN_CENTRE, "ranking:");
+		    al_draw_text(fonte3, al_map_rgb(255, 255, 255), 400, 350, ALLEGRO_ALIGN_CENTRE, jNome);
                     break;
                 case RANKING:
                     al_draw_text(fonte2, al_map_rgb(255, 255, 255), 50, 50, 0, "Ranking");
@@ -251,7 +254,7 @@ void escreverNome(char str[4], int letra) {
     if (letra >= ALLEGRO_KEY_A && letra <= ALLEGRO_KEY_Z) {
         for (i = 0; i < 3; i++)
             if (str[i] == '_') {
-                str[i] = al_keycode_to_name(letra)[0] - 32;
+                str[i] = al_keycode_to_name(letra)[0];
                 break;
             }
     } else if (letra >= ALLEGRO_KEY_0 && letra <= ALLEGRO_KEY_9) {
