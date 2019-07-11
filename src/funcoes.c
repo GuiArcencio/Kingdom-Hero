@@ -1,9 +1,9 @@
 #include "header/funcoes.h"
-
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
 #include <stdlib.h>
+#include <allegro5/allegro.h>
 
 float aumentaVelocidade(unsigned int pont){ //pont == pontuação
     return sqrt(pont/100.0) + 1;
@@ -23,15 +23,36 @@ void salvaRanking(Jogador j){ //Salva o nome e a pontuação em um arquivo
         numJogadores++;
         Jogador* jRanking = (Jogador*) malloc(numJogadores*sizeof(Jogador)); //Jogadores que já estão no ranking
         if (jRanking == NULL) exit(1);
+        int i;
+        bool jaExiste = false;
+
         fread(jRanking, sizeof(Jogador), numJogadores-1, p);
-        jRanking[numJogadores-1] = j; // Copia o novo jogador para o array
+        for (i = 0; i < numJogadores-1; i++) {
+            if (!strcmp(jRanking[i].nome, j.nome)) {
+                if (j.pont > jRanking[i].pont) {
+                    jaExiste = true;
+                    jRanking[i].pont = j.pont;
+                } else {
+                    fclose(p);
+                    free(jRanking);
+                    return; // se a nova pontuação do jogador for menor, não vamos trocar nada
+                }
+                break;
+            }
+        }
+
+        if (!jaExiste) {
+            jRanking[numJogadores-1] = j; // Copia o novo jogador para o array
+        } else {
+            numJogadores--;
+        }
+
         qsort(jRanking, numJogadores, sizeof(Jogador), compareJogador); // Ordenando o vetor
         rewind(p);
         numJogadores = (numJogadores > 5 ? 5 : numJogadores); // Escrevendo, no máximo, 5 jogadores do ranking no arquivo
         fwrite(&numJogadores, sizeof(int), 1, p);
         fwrite(jRanking, sizeof(Jogador), numJogadores, p);
         fclose(p);
-
         free(jRanking);
     }
 }
