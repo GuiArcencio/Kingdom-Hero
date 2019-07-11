@@ -25,31 +25,34 @@ void salvaRanking(Jogador j){ //Salva o nome e a pontuação em um arquivo
         if (jRanking == NULL) exit(1);
         int i;
         bool jaExiste = false;
-        
+
+        fread(jRanking, sizeof(Jogador), numJogadores-1, p);
         for (i = 0; i < numJogadores-1; i++) {
             if (!strcmp(jRanking[i].nome, j.nome)) {
-                jaExiste = true;
-                jRanking[i].pont = j.pont;
+                if (j.pont > jRanking[i].pont) {
+                    jaExiste = true;
+                    jRanking[i].pont = j.pont;
+                } else {
+                    fclose(p);
+                    free(jRanking);
+                    return; // se a nova pontuação do jogador for menor, não vamos trocar nada
+                }
                 break;
             }
         }
+
         if (!jaExiste) {
             jRanking[numJogadores-1] = j; // Copia o novo jogador para o array
-            qsort(jRanking, numJogadores, sizeof(Jogador), compareJogador); // Ordenando o vetor
-            rewind(p);
-            numJogadores = (numJogadores > 5 ? 5 : numJogadores); // Escrevendo, no máximo, 5 jogadores do ranking no arquivo
-            fwrite(&numJogadores, sizeof(int), 1, p);
-            fwrite(jRanking, sizeof(Jogador), numJogadores, p);
-            fclose(p);
         } else {
             numJogadores--;
-            qsort(jRanking, numJogadores, sizeof(Jogador), compareJogador); // Ordenando o vetor
-            rewind(p);
-            numJogadores = (numJogadores > 5 ? 5 : numJogadores); // Escrevendo, no máximo, 5 jogadores do ranking no arquivo
-            fwrite(&numJogadores, sizeof(int), 1, p);
-            fwrite(jRanking, sizeof(Jogador), numJogadores, p);
-            fclose(p);
         }
+
+        qsort(jRanking, numJogadores, sizeof(Jogador), compareJogador); // Ordenando o vetor
+        rewind(p);
+        numJogadores = (numJogadores > 5 ? 5 : numJogadores); // Escrevendo, no máximo, 5 jogadores do ranking no arquivo
+        fwrite(&numJogadores, sizeof(int), 1, p);
+        fwrite(jRanking, sizeof(Jogador), numJogadores, p);
+        fclose(p);
         free(jRanking);
     }
 }
